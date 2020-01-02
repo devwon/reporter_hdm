@@ -1,4 +1,4 @@
-#!~/reporter_hdm/botvenv/bin/python
+#!~/reporter_hdm/botvenv/bin/python     #가상환경내 파이썬사용
 
 # hakdokman news web crawler 만들기
 import os
@@ -32,15 +32,15 @@ def news_crawler():
 
     params = {
         # 'query': '%22%ED%95%99%EC%83%9D%EB%8F%85%EB%A6%BD%EB%A7%8C%EC%84%B8%22-%ED%95%99%EC%83%9D%EB%8F%85%EB%A6%BD%EB%A7%8C%EC%84%B8%EC%9A%B4%EB%8F%99',
-        'query': '"학생독립만세"-학생독립만세운동',
+        'query': '"학생독립만세"-학생독립만세운동',   #검색어: '학생독립만세'('학생독립만세운동'은 제외)
         'where': 'news',
         'sm': 'tab_opt',
         # 'sm': 'tab_pge', # pagination 사용시 주석 풀기
         # 'start': '22', # pagination 사용시 주석 풀기
         'sort': '1',
         'pd': '3',
-        #'ds': '2019.02.05',  # 오늘 날짜 변수 넣기
-        #'de': '2019.02.05',  # 오늘 날짜 변수 넣기
+        #'ds': '2020.01.02',  # 오늘 날짜 변수 넣기
+        #'de': '2020.01.02',  # 오늘 날짜 변수 넣기
         'ds': today,  # 오늘 날짜 변수 넣기
         'de': today,  # 오늘 날짜 변수 넣기
     }
