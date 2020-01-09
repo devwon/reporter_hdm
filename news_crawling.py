@@ -3,6 +3,9 @@
 # hakdokman news web crawler 만들기
 import os
 import time
+import sys
+# 모듈 import하기 전에 pip 모듈 install된 경로 지정(하드코딩)
+sys.path.append('/usr/local/lib/python3.7/site-packages/')
 from slackclient import SlackClient
 
 import requests
@@ -64,7 +67,6 @@ def news_crawler():
         for tag in sp_tags:
             if tag['title'] not in post_dict:
                 post_dict[tag['title']] = tag['href']   #title 중복아닌 경우에만 링크를 post_dict에 할당
-                #post_dict[tag['title']] = tag['href'].replace("http://", "https://")  # http->https 바꿔주고, post_dict에 할당
 
         print(len(post_dict), "news")
         return post_dict
