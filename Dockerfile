@@ -24,7 +24,6 @@ WORKDIR $APP_HOME
 RUN pip install -r requirements.txt
 
 # 크론탭 설정&실행(매일 오후 11시59분)
-#RUN (crontab -l ; echo "* * * * * /reporter_hdm/start_crawling.sh >> /reporter_hdm/reporter_hdm.log 2>&1") | crontab
 RUN (crontab -l ; echo "59 23 * * * /reporter_hdm/start_crawling.sh >> /reporter_hdm/reporter_hdm.log 2>&1") | crontab
 
 ENTRYPOINT cron start $$ tail -f /reporter_hdm/reporter_hdm.log
