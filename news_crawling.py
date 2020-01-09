@@ -36,16 +36,14 @@ def news_crawler():
     params = {
         # 'query': '%22%ED%95%99%EC%83%9D%EB%8F%85%EB%A6%BD%EB%A7%8C%EC%84%B8%22-%ED%95%99%EC%83%9D%EB%8F%85%EB%A6%BD%EB%A7%8C%EC%84%B8%EC%9A%B4%EB%8F%99',
         'query': '"학생독립만세"-학생독립만세운동',   #검색어: '학생독립만세'('학생독립만세운동'은 제외)
-        'where': 'news',
-        'sm': 'tab_opt',
+        'where': 'news',    # 뉴스 카테고리 검색
+        'sm': 'tab_opt',    # 옵션으로 검색
         # 'sm': 'tab_pge', # pagination 사용시 주석 풀기
         # 'start': '22', # pagination 사용시 주석 풀기
-        'sort': '1',
-        'pd': '3',
-        #'ds': '2020.01.02',  # 오늘 날짜 변수 넣기
-        #'de': '2020.01.02',  # 오늘 날짜 변수 넣기
-        'ds': today,  # 오늘 날짜 변수 넣기
-        'de': today,  # 오늘 날짜 변수 넣기
+        'sort': '1',    # 옵션 - 최신순 정렬
+        'pd': '3',  # 옵션 - 기간 직접입력
+        'ds': today,  # 오늘 날짜
+        'de': today,  # 오늘 날짜
     }
 
     # 오늘자 네이버 뉴스 '학생독립만세'('학생독립만세운동'은 제외) 검색요청 객체 생성
@@ -82,9 +80,9 @@ def hakdokman_noti():
 
             slack_client.api_call(
                 "chat.postMessage",
-                channel='#newsbot_hdm',  #newsbot_hdm 채널에 기사 알림
+                username = '학독만 뉴스봇',
+                channel='#pressabouthakdokman',  #pressabouthakdokman 채널에 기사 알림
                 text='<'+link+'|'+title+'>',    #링크 바로가기 형식으로 메시지 노출
-                #attachments=[{"pretext": link, "text": title}],
                 unfurl_links=True       # 링크 미리보기 true로 해놓고 메타데이터 있는 경우에도 미리보기 노출 안되는 케이스 존재..
             )
 
