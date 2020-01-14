@@ -66,10 +66,10 @@ def news_crawler():
             if tag['title'] not in post_dict:
                 post_dict[tag['title']] = tag['href']   #title 중복아닌 경우에만 링크를 post_dict에 할당
 
-        print(len(post_dict), "news")
+        print(len(post_dict), "news in "+today)
         return post_dict
     else:
-        print("오늘 날짜("+today+")의 학독만 관련 뉴스가 없습니다ㅠㅠ")
+        print("There is no news about hakdokman in "+today)
 
 
 def hakdokman_noti():
@@ -80,8 +80,8 @@ def hakdokman_noti():
 
             slack_client.api_call(
                 "chat.postMessage",
-                username = '학독만 뉴스봇',
-                channel='#pressabouthakdokman',  #pressabouthakdokman 채널에 기사 알림
+                username='학독만 뉴스봇',
+                channel='#newsbot_hdm',  #pressabouthakdokman 채널에 기사 알림
                 text='<'+link+'|'+title+'>',    #링크 바로가기 형식으로 메시지 노출
                 unfurl_links=True       # 링크 미리보기 true로 해놓고 메타데이터 있는 경우에도 미리보기 노출 안되는 케이스 존재..
             )
