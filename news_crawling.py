@@ -29,8 +29,6 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 def news_crawler():
     url = 'https://search.naver.com/search.naver'
     post_dict = OrderedDict()
-    title_text = []
-    link_text = []
     today = datetime.today().strftime("%Y.%m.%d")  # YYYY.mm.dd 형태의 시간 출력
 
     params = {
@@ -75,13 +73,12 @@ def news_crawler():
 def hakdokman_noti():
     response = news_crawler()    # 크롤러 호출
     if response:                 # 학독만 관련 새로운 뉴스가 있을 경우에만 메시지 보냄.
-        #for link_text in response:
         for title, link in response.items():
 
             slack_client.api_call(
                 "chat.postMessage",
                 username='학독만 뉴스봇',
-                channel='#newsbot_hdm',  #pressabouthakdokman 채널에 기사 알림
+                channel='#pressabouthakdokman',  #pressabouthakdokman 채널에 기사 알림
                 text='<'+link+'|'+title+'>',    #링크 바로가기 형식으로 메시지 노출
                 unfurl_links=True       # 링크 미리보기 true로 해놓고 메타데이터 있는 경우에도 미리보기 노출 안되는 케이스 존재..
             )
