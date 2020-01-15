@@ -29,7 +29,9 @@ RUN echo "Asia/Seoul" > /etc/timezone
 RUN ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
 # 크론탭 설정&실행(매일 오후 11시59분)
-RUN (crontab -l ; echo "59 23 * * * $APP_HOME/start_crawling.sh > /proc/1/fd/1 2>/proc/1/fd/2") | crontab -
+#RUN (crontab -l ; echo "59 23 * * * $APP_HOME/start_crawling.sh > /proc/1/fd/1 2>/proc/1/fd/2") | crontab -
+# 테스트를 위해 1분마다 크론탭 돌리기
+RUN (crontab -l ; echo "* * * * * $APP_HOME/start_crawling.sh > /proc/1/fd/1 2>/proc/1/fd/2") | crontab -
 
 # 파일 권한 +x 설정
 RUN chmod +x $APP_HOME/entrypoint.sh
