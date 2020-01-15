@@ -79,6 +79,7 @@ def hakdokman_noti():
                 "chat.postMessage",
                 username='학독만 뉴스봇',
                 channel='#pressabouthakdokman',  #pressabouthakdokman 채널에 기사 알림
+                icon_url='https://ifh.cc/g/bHH3e.png',  #학독만 뉴스봇 아이콘 이미지 링크(IFH 이미지 호스팅 이용)
                 text='<'+link+'|'+title+'>',    #링크 바로가기 형식으로 메시지 노출
                 unfurl_links=True       # 링크 미리보기 true로 해놓고 메타데이터 있는 경우에도 미리보기 노출 안되는 케이스 존재..
             )
