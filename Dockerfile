@@ -34,7 +34,7 @@ RUN (crontab -l ; echo "59 23 * * * $APP_HOME/start_crawling.sh > /proc/1/fd/1 2
 # 파일 권한 +x 설정
 RUN chmod +x $APP_HOME/entrypoint.sh
 
-# cron pam 설정 변경 the module pam_loginuid.so inside /etc/pam.d/cron
+# cron pam 설정 변경 - pam_loginuid.so 주석 처리 inside /etc/pam.d/cron
 RUN sed -i '/session    required     pam_loginuid.so/c\#session    required   pam_loginuid.so' /etc/pam.d/cron
 
 # 컨테이너 작동 확인 & cron 실행하는 shell 파일 호출
