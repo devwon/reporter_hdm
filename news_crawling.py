@@ -70,19 +70,12 @@ def news_crawler():
         print("There is no news about hakdokman in "+today)
 
 
-def hakdokman_noti():
+def hakdokman_noti(**api_conf):
     response = news_crawler()    # 크롤러 호출
     if response:                 # 학독만 관련 새로운 뉴스가 있을 경우에만 메시지 보냄.
         for title, link in response.items():
-
-            slack_client.api_call(
-                "chat.postMessage",
-                username='학독만 뉴스봇',
-                channel='#pressabouthakdokman',  #pressabouthakdokman 채널에 기사 알림
-                icon_url='https://ifh.cc/g/bHH3e.png',  #학독만 뉴스봇 아이콘 이미지 링크(IFH 이미지 호스팅 이용)
-                text='<'+link+'|'+title+'>',    #링크 바로가기 형식으로 메시지 노출
-                unfurl_links=True       # 링크 미리보기 true로 해놓고 메타데이터 있는 경우에도 미리보기 노출 안되는 케이스 존재..
-            )
+            api_conf['text'] = f'<{link}|{title}>'
+            slack_client.api_call('chat.postMessage', **api_conf)
 
 
 if __name__ == "__main__":
@@ -90,8 +83,17 @@ if __name__ == "__main__":
         print("Starter Bot connected and running!")
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
+
+        initial_config = {
+            'username': '학독만 뉴스봇',
+            'channel': '#뉴스_학독만',  # 기사 업로드할 채널명
+            'icon_url': 'https://ifh.cc/g/bHH3e.png',  #학독만 뉴스봇 아이콘 이미지 링크(IFH 이미지 호스팅 이용)
+            'text': '<{link}|{title}>',    #링크 바로가기 형식으로 메시지 노출
+            'unfurl_links': True       # 링크 미리보기 true로 해놓고 메타데이터 있는 경우에도 미리보기 노출 안되는 케이스 존재..
+        }
+
         while True:
-            hakdokman_noti()
+            hakdokman_noti(**initial_config)
             time.sleep(RTM_READ_DELAY)
             break
     else:
