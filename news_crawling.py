@@ -1,8 +1,9 @@
+#!~/reporter_hdm/botvenv/bin/python     #가상환경내 파이썬사용
+
 # hakdokman news web crawler 만들기
 import os
 import time
 import sys
-import logging
 # 모듈 import하기 전에 pip 모듈 install된 경로 지정(하드코딩)
 sys.path.append('/usr/local/lib/python3.7/site-packages/')
 from slackclient import SlackClient
@@ -22,20 +23,6 @@ starterbot_id = None
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 EXAMPLE_COMMAND = "뉴스"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
-
-form = '<{link}|{title}>'
-error_config = {
-    'username': '학독만 뉴스봇',
-    'channel': '#newsbot_hdm',  # 기사 업로드할 채널명
-    'text': 'error',  # 에러 메시지 노출
-}
-
-# logging 관련 셋팅
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.DEBUG
-                    )
-
 
 # hakdokman news web crawler
 # 당일 날짜의 학독만 관련 뉴스 링크를 크롤링해서 가져온다.
@@ -87,7 +74,7 @@ def hakdokman_noti(**api_conf):
     response = news_crawler()    # 크롤러 호출
     if response:                 # 학독만 관련 새로운 뉴스가 있을 경우에만 메시지 보냄.
         for title, link in response.items():
-            api_conf['text'] = form.format(link=link, title=title)   # 링크 바로가기 형식으로 메시지 노출
+            api_conf['text'] = f'<{link}|{title}>'
             slack_client.api_call('chat.postMessage', **api_conf)
 
 
@@ -99,19 +86,15 @@ if __name__ == "__main__":
 
         initial_config = {
             'username': '학독만 뉴스봇',
-            'channel': '#뉴스_학독만',     # 기사 업로드할 채널명
-            'text': form,    # 링크 바로가기 형식으로 메시지 노출
-            'unfurl_links': True           # 링크 미리보기 true로 해놓고 메타데이터 있는 경우에도 미리보기 노출 안되는 케이스 존재..
+            'channel': '#뉴스_학독만',  # 기사 업로드할 채널명
+            'icon_url': 'https://ifh.cc/g/bHH3e.png',  #학독만 뉴스봇 아이콘 이미지 링크(IFH 이미지 호스팅 이용)
+            'text': '<{link}|{title}>',    #링크 바로가기 형식으로 메시지 노출
+            'unfurl_links': True       # 링크 미리보기 true로 해놓고 메타데이터 있는 경우에도 미리보기 노출 안되는 케이스 존재..
         }
 
         while True:
-            try:
-                hakdokman_noti(**initial_config)
-                time.sleep(RTM_READ_DELAY)
-            except Exception as error:
-                logging.exception(error)
-                error_config['text'] = "[ERROR OCCURRED] "+str(error)
-                slack_client.api_call('chat.postMessage', **error_config)   # 에러 내용 SLACK 전송
+            hakdokman_noti(**initial_config)
+            time.sleep(RTM_READ_DELAY)
             break
     else:
         print("Connection failed. Exception traceback printed above.")
