@@ -5,12 +5,22 @@ MAINTAINER HAKDOKMAN
 # 기본 셋팅
 ENV APP_HOME /reporter_hdm 
 ENV PYTHONIOENCODING UTF-8
+# set display port to avoid crash
+ENV DISPLAY=:99
 
-# apt-get 업그레이드 & crontab 설치
-RUN apt-get update && apt-get -y install cron
+# apt 업그레이드
+RUN apt update && apt install -y gnupg wget curl apt-utils
+# google chrome key 다운로드 후 이 key를 키링에 추가하여 패키지 관리자가 Chrome deb의 무결성 확인 가능
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
 
-# python venv 실행
-#RUN python3 -m venv botvenv
+# chrome, crontab 설치
+RUN apt update && apt install -y google-chrome-stable cron
+
+# chromedriver 설치
+RUN apt install -yqq unzip
+RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
+RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin
 
 # pip 업그레이드
 RUN pip install --upgrade pip
