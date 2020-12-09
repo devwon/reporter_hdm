@@ -3,14 +3,14 @@ import os
 import time
 import sys
 import logging
+
 # 모듈 import하기 전에 pip 모듈 install된 경로 지정(하드코딩)
 sys.path.append('/usr/local/lib/python3.7/site-packages/')
 from slackclient import SlackClient
-
-import requests
 from bs4 import BeautifulSoup
 from collections import OrderedDict  # 순서가 있는 OrderedDict 불러오기
 from datetime import datetime
+from selenium import webdriver
 
 
 # instantiate Slack client
@@ -44,6 +44,18 @@ def news_crawler():
     post_dict = OrderedDict()
     today = datetime.today().strftime("%Y.%m.%d")  # YYYY.mm.dd 형태의 시간 출력
 
+    # 크롬 설정
+    options = webdriver.ChromeOptions()
+    # 새 화면창 없이 크롤링 실행
+    options.add_argument('headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('window-size=1920x1080')
+    options.add_argument('disable-gpu')
+    chrome_path = r"/usr/local/bin/chromedriver"
+
+    driver = webdriver.Chrome(chrome_path, chrome_options=options)
+
+    # 쿼리 파라메터 설정
     params = {
         # 'query': '%22%ED%95%99%EC%83%9D%EB%8F%85%EB%A6%BD%EB%A7%8C%EC%84%B8%22-%ED%95%99%EC%83%9D%EB%8F%85%EB%A6%BD%EB%A7%8C%EC%84%B8%EC%9A%B4%EB%8F%99',
         'query': '"학생독립만세"-학생독립만세운동',   #검색어: '학생독립만세'('학생독립만세운동'은 제외)
@@ -56,31 +68,34 @@ def news_crawler():
         'ds': today,  # 오늘 날짜
         'de': today,  # 오늘 날짜
     }
+    param_set = ''
+    for k, v in params.items():
+        param_set += '{}={}&'.format(k, v)
+    param_set = param_set[:-1]
 
-    # 오늘자 네이버 뉴스 '학생독립만세'('학생독립만세운동'은 제외) 검색요청 객체 생성
-    res = requests.get(url, params=params)
+    # full url 생성
+    full_url = '{}?{}'.format(url, param_set)
     # full url 예시는 아래와 같다
     # https://search.naver.com/search.naver?where=news&query=%22%ED%95%99%EC%83%9D%EB%8F%85%EB%A6%BD%EB%A7%8C%EC%84%B8%22-%ED%95%99%EC%83%9D%EB%8F%85%EB%A6%BD%EB%A7%8C%EC%84%B8%EC%9A%B4%EB%8F%99&sm=tab_opt&sort=1&pd=3&ds=2019.12.27&de=2019.12.27
 
-    # 검색 후 소스코드 추출
-    html = res.text
+    # 오늘자 네이버 뉴스 '학생독립만세'('학생독립만세운동'은 제외) 검색요청 객체 생성
+    driver.get(full_url)
+    req = driver.page_source
+    # 검색 후 소스코드 추출 html -> python object
+    soup = BeautifulSoup(req, 'html.parser')
+    # 원하는 태그 추출
+    news_list = soup.select('div.news_wrap.api_ani_send > div.news_area > a.news_tit')
+    if news_list:
+        for news in news_list:
+            title = news.attrs.get('title', None)
+            href = news.attrs.get('href', None)
+            if title and title not in post_dict and href:
+                post_dict[title] = href  # title 중복아닌 경우에만 링크를 post_dict에 할당
 
-    # html -> python object
-    soup = BeautifulSoup(html, 'html.parser')
-
-    # 태그에서 제목과 링크주소 추출
-    sp_tags = soup.select('._sp_each_title')
-
-    if sp_tags:
-
-        for tag in sp_tags:
-            if tag['title'] not in post_dict:
-                post_dict[tag['title']] = tag['href']   #title 중복아닌 경우에만 링크를 post_dict에 할당
-
-        print(len(post_dict), "news in "+today)
+        print(len(post_dict), "news in " + today)
         return post_dict
     else:
-        print("There is no news about hakdokman in "+today)
+        print("There is no news about hakdokman in " + today)
 
 
 def hakdokman_noti(**api_conf):
